@@ -32,21 +32,21 @@
     },
     "autoload": {
         "psr-4": {
-            "Swedbank\\\\LaravelPaymentApi\\\\": "src/"
+            "LimeTools\\\\Swedbank\\\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Swedbank\\\\LaravelPaymentApi\\\\Tests\\\\": "tests/"
+            "LimeTools\\\\Swedbank\\\\Tests\\\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Swedbank\\\\LaravelPaymentApi\\\\SwedbankPaymentServiceProvider"
+                "LimeTools\\\\Swedbank\\\\SwedbankPaymentServiceProvider"
             ],
             "aliases": {
-                "SwedbankPayment": "Swedbank\\\\LaravelPaymentApi\\\\Facades\\\\SwedbankPayment"
+                "SwedbankPayment": "LimeTools\\\\Swedbank\\\\Facades\\\\SwedbankPayment"
             }
         }
     },

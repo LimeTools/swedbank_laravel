@@ -1,6 +1,6 @@
 <?php
 
-namespace Swedbank\LaravelPaymentApi;
+namespace LimeTools\Swedbank;
 
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;

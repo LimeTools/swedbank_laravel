@@ -88,7 +88,7 @@ The package provides a `SwedbankPaymentApi` class that can be used in several wa
 #### Using Dependency Injection
 
 ```php
-use Swedbank\LaravelPaymentApi\SwedbankPaymentApi;
+use LimeTools\Swedbank\SwedbankPaymentApi;
 
 class PaymentController extends Controller
 {
@@ -101,7 +101,7 @@ class PaymentController extends Controller
 #### Using the Facade
 
 ```php
-use Swedbank\LaravelPaymentApi\Facades\SwedbankPayment;
+use LimeTools\Swedbank\Facades\SwedbankPayment;
 
 class PaymentController extends Controller
 {
@@ -119,7 +119,7 @@ class PaymentController extends Controller
 #### Using the Service Container
 
 ```php
-$swedbankApi = app(Swedbank\LaravelPaymentApi\SwedbankPaymentApi::class);
+$swedbankApi = app(LimeTools\Swedbank\SwedbankPaymentApi::class);
 ```
 
 ## Step-by-step integration guide
@@ -213,7 +213,7 @@ Create `app/Http/Controllers/SwedbankPaymentController.php`:
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Swedbank\LaravelPaymentApi\SwedbankPaymentApi;
+use LimeTools\Swedbank\SwedbankPaymentApi;
 
 class SwedbankPaymentController extends Controller
 {
@@ -394,7 +394,7 @@ Here's a complete example of a payment flow:
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Swedbank\LaravelPaymentApi\SwedbankPaymentApi;
+use LimeTools\Swedbank\SwedbankPaymentApi;
 
 class PaymentController extends Controller
 {

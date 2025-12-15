@@ -1,6 +1,6 @@
 <?php
 
-namespace Swedbank\LaravelPaymentApi\Facades;
+namespace LimeTools\Swedbank\Facades;
 
 use Illuminate\Support\Facades\Facade;
 
@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array getPaymentProviders(string $country, string $clientId, string $privateKey)
  * @method static array getPaymentInitiationForm(string $bic, array $paymentData, string $clientId, string $privateKey)
  *
- * @see \Swedbank\LaravelPaymentApi\SwedbankPaymentApi
+ * @see \LimeTools\Swedbank\SwedbankPaymentApi
  */
 class SwedbankPayment extends Facade
 {
@@ -21,7 +21,7 @@ class SwedbankPayment extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return \Swedbank\LaravelPaymentApi\SwedbankPaymentApi::class;
+        return \LimeTools\Swedbank\SwedbankPaymentApi::class;
     }
 }
 
