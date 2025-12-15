@@ -32,21 +32,21 @@
     },
     "autoload": {
         "psr-4": {
-            "LimeTools\\\\Swedbank\\\\": "src/"
+            "LimeTools\\Swedbank\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "LimeTools\\\\Swedbank\\\\Tests\\\\": "tests/"
+            "LimeTools\\Swedbank\\Tests\\": "tests/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "LimeTools\\\\Swedbank\\\\SwedbankPaymentServiceProvider"
+                "LimeTools\\Swedbank\\SwedbankPaymentServiceProvider"
             ],
             "aliases": {
-                "SwedbankPayment": "LimeTools\\\\Swedbank\\\\Facades\\\\SwedbankPayment"
+                "SwedbankPayment": "LimeTools\\Swedbank\\Facades\\SwedbankPayment"
             }
         }
     },
