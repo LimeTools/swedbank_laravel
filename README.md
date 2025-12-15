@@ -24,7 +24,7 @@ A Laravel package for integrating with Swedbank Payment Initiation API V3. This 
 
 ## Installation
 
-### Via Composer (when published to Packagist)
+### Via Composer
 
 You can install the package via Composer:
 
@@ -32,29 +32,6 @@ You can install the package via Composer:
 composer require swedbank/laravel-payment-api
 ```
 
-### Install from GitHub
-
-To install directly from GitHub, add the repository to your `composer.json`:
-
-```json
-{
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/LimeTools/swedbank_laravel"
-        }
-    ],
-    "require": {
-        "swedbank/laravel-payment-api": "dev-main"
-    }
-}
-```
-
-Then run:
-
-```bash
-composer require swedbank/laravel-payment-api:dev-main
-```
 
 ### Publish Configuration
 
@@ -144,6 +121,170 @@ class PaymentController extends Controller
 ```php
 $swedbankApi = app(Swedbank\LaravelPaymentApi\SwedbankPaymentApi::class);
 ```
+
+## Step-by-step integration guide
+
+This is a minimal, end-to-end example to get you from a fresh Laravel install to a working Swedbank payment redirect.
+
+### 1. Install the package
+
+#### a) From GitHub (recommended now)
+
+In your application `composer.json`:
+
+```json
+{
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/LimeTools/swedbank_laravel"
+        }
+    ],
+    "require": {
+        "limetools/swedbank_laravel": "dev-main"
+    }
+}
+```
+
+Then install:
+
+```bash
+composer require limetools/swedbank_laravel:dev-main
+```
+
+### 2. Publish and configure
+
+Publish the config file:
+
+```bash
+php artisan vendor:publish --tag=swedbank-config
+```
+
+This creates `config/swedbank.php`.
+
+Add environment variables to `.env` (start with sandbox):
+
+```env
+SWEDBANK_ENVIRONMENT=sandbox
+
+SWEDBANK_SANDBOX_ENABLED=true
+SWEDBANK_SANDBOX_CLIENT_ID=your_sandbox_client_id
+SWEDBANK_SANDBOX_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
+
+SWEDBANK_PRODUCTION_ENABLED=false
+
+SWEDBANK_LOGGING_ENABLED=true
+SWEDBANK_LOG_LEVEL=info
+SWEDBANK_LOG_CHANNEL=swedbank
+```
+
+Optionally, configure a log channel in `config/logging.php`:
+
+```php
+'channels' => [
+    // ...
+    'swedbank' => [
+        'driver' => 'daily',
+        'path' => storage_path('logs/swedbank.log'),
+        'level' => env('SWEDBANK_LOG_LEVEL', 'info'),
+        'days' => 14,
+    ],
+],
+```
+
+### 3. Create routes
+
+In `routes/web.php`:
+
+```php
+use App\Http\Controllers\SwedbankPaymentController;
+
+Route::get('/pay/{order}', [SwedbankPaymentController::class, 'start'])->name('swedbank.pay');
+Route::get('/pay/{order}/callback', [SwedbankPaymentController::class, 'callback'])->name('swedbank.callback');
+```
+
+### 4. Create a simple controller
+
+Create `app/Http/Controllers/SwedbankPaymentController.php`:
+
+```php
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Swedbank\LaravelPaymentApi\SwedbankPaymentApi;
+
+class SwedbankPaymentController extends Controller
+{
+    public function __construct(
+        protected SwedbankPaymentApi $swedbankApi
+    ) {}
+
+    public function start(Request $request, int $orderId)
+    {
+        // Replace this with your real order fetch
+        $amount = '100.00'; // EUR
+
+        $clientId = config('swedbank.production.client_id') ?? config('swedbank.sandbox.client_id');
+        $privateKey = config('swedbank.production.private_key') ?? config('swedbank.sandbox.private_key');
+
+        $paymentData = [
+            'amount' => [
+                'currency' => 'EUR',
+                'value' => $amount,
+            ],
+            'creditor' => [
+                'name' => config('app.name'),
+                'iban' => config('swedbank.merchant_iban', 'LT123456789012345678'),
+                'bic' => config('swedbank.merchant_bic', 'HABALT22'),
+            ],
+            'debtor' => [
+                'name' => $request->user()->name ?? 'Customer',
+            ],
+            'remittanceInformationUnstructured' => 'Order #' . $orderId,
+            'redirectUri' => route('swedbank.callback', ['order' => $orderId]),
+            'state' => (string) $orderId,
+        ];
+
+        $redirectUrl = $this->swedbankApi->createPaymentInitiation(
+            $paymentData,
+            $clientId,
+            $privateKey
+        );
+
+        return redirect($redirectUrl);
+    }
+
+    public function callback(Request $request, int $orderId)
+    {
+        // In a real app you would typically store and use a status URL
+        $statusUrl = $request->query('statusUrl') ?? $request->query('paymentId');
+
+        if (! $statusUrl) {
+            return redirect()->route('home')->with('error', 'Missing payment status URL');
+        }
+
+        $clientId = config('swedbank.production.client_id') ?? config('swedbank.sandbox.client_id');
+        $privateKey = config('swedbank.production.private_key') ?? config('swedbank.sandbox.private_key');
+
+        $status = $this->swedbankApi->getPaymentStatus(
+            $statusUrl,
+            $clientId,
+            $privateKey
+        );
+
+        if (($status['status'] ?? null) === 'EXECUTED') {
+            // Mark your order as paid here
+            return redirect()->route('home')->with('success', 'Payment successful');
+        }
+
+        return redirect()->route('home')->with('error', 'Payment not completed');
+    }
+}
+```
+
+This controller is intentionally simple; adapt it to your own `Order` model and domain logic.
 
 ### Get Payment Providers
 
