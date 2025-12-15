@@ -29,7 +29,7 @@ A Laravel package for integrating with Swedbank Payment Initiation API V3. This 
 You can install the package via Composer:
 
 ```bash
-composer require swedbank/laravel-payment-api
+composer require limetools/swedbank_laravel
 ```
 
 
